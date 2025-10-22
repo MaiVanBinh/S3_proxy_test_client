@@ -207,8 +207,8 @@
 
         static void Initialize()
         {
-            SetBucket();
-            SetRegion();
+            // SetBucket();
+            // SetRegion();
             SetSsl();
             SetEndpoint();
             SetAccessKey();
@@ -401,10 +401,13 @@
         {
             try
             {
+                string bucketName = Inputty.GetString("Bucket name:", "s3-proxy-bucket1", false);
                 string continuationToken = Inputty.GetString("Continuation token:", null, true);
+                _S3Credentials = new Amazon.Runtime.BasicAWSCredentials(_AccessKey, _SecretKey);
+                _S3Client = new AmazonS3Client(_S3Credentials, _S3Config);
 
                 ListObjectsV2Request request = new ListObjectsV2Request();
-                request.BucketName = "s3-proxy-bucket1";
+                request.BucketName = bucketName;
                 request.ContinuationToken = continuationToken;
 
                 ListObjectsV2Response response = _S3Client.ListObjectsV2Async(request).Result;
@@ -737,6 +740,7 @@
 
         static void WriteObject()
         {
+            string bucketName = Inputty.GetString("Bucket name:", "s3-proxy-bucket1", false);
             string id = Inputty.GetString("Key:", null, false);
             string filePath = Inputty.GetString("File path (leave blank for no data):", null, true);
             byte[] bytes = Array.Empty<byte>();
@@ -750,7 +754,7 @@
 
                 var request = new PutObjectRequest
                 {
-                    BucketName = "s3-proxy-bucket1",
+                    BucketName = bucketName,
                     Key = id,
                     InputStream = stream,
                     AutoCloseStream = true,
@@ -903,12 +907,13 @@
 
         static void ReadObject()
         {
+            string bucketName = Inputty.GetString("Bucket name:", "s3-proxy-bucket1", false);
             string id = Inputty.GetString("Key:", null, false);
 
             try
             {
                 GetObjectRequest request = new GetObjectRequest();
-                request.BucketName = _Bucket;
+                request.BucketName = bucketName;
                 request.Key = id;
 
                 using (GetObjectResponse response = _S3Client.GetObjectAsync(request).Result)
@@ -1249,13 +1254,14 @@
 
         static void ObjectExists()
         {
+            string bucketName = Inputty.GetString("Bucket name:", "s3-proxy-bucket1", false);
             string id = Inputty.GetString("Key:", null, false);
             int ver = Inputty.GetInteger("Version:", 1, true, false);
 
             try
             {
                 GetObjectMetadataRequest request = new GetObjectMetadataRequest();
-                request.BucketName = _Bucket;
+                request.BucketName = bucketName;
                 request.Key = id;
                 request.VersionId = ver.ToString();
 
