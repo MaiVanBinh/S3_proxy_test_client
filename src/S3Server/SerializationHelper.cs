@@ -252,7 +252,7 @@
             public override void Write(Utf8JsonWriter writer, NameValueCollection value, JsonSerializerOptions options)
             {
                 var val = value.Keys.Cast<string>()
-                    .ToDictionary(k => k, k => string.Join(", ", value.GetValues(k)));
+                    .ToDictionary(k => k, k => string.Join(", ", value.GetValues(k) ?? new string[0]));
                 System.Text.Json.JsonSerializer.Serialize(writer, val);
             }
         }
